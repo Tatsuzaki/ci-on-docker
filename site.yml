@@ -1,8 +1,10 @@
 ---
-- hosts: all
+- name: Configure all hosts with basic setup
+  hosts: all
   gather_facts: false
   tasks:
-    - yum:
+    - name: Install SSH and sudo packages
+      dnf:
         name: '{{ item }}'
         state: latest
       loop:
@@ -25,38 +27,45 @@
         - getty@tty1.service
         - serial-getty@ttyS0.service
 
-    - group:
+    - name: Create vagrant group
+      group:
         name: vagrant
         state: present
 
-    - user:
+    - name: Create vagrant user
+      user:
         name: vagrant
         groups: vagrant,wheel
 
-    - file:
+    - name: Create vagrant SSH directory
+      file:
         path: /home/vagrant/.ssh
         state: directory
-        mode: 0700
+        mode: '0700'
         owner: vagrant
         group: vagrant
 
-    - copy:
+    - name: Copy SSH authorized keys
+      copy:
         src: authorized_keys
         dest: /home/vagrant/.ssh/authorized_keys
-        mode: 0644
+        mode: '0644'
         owner: vagrant
         group: vagrant
 
-    - lineinfile:
+    - name: Add vagrant to sudoers
+      lineinfile:
         path: /etc/sudoers
         state: present
         regexp: '^vagrant\s'
         line: 'vagrant ALL=(ALL) NOPASSWD: ALL'
 
-- hosts: consoles
+- name: Configure console host with development tools
+  hosts: consoles
   gather_facts: true
   tasks:
-    - yum:
+    - name: Install development tools
+      dnf:
         name: '{{ item }}'
         state: latest
       loop:
@@ -66,12 +75,10 @@
         - git
         - epel-release
 
-    - yum:
-        name: '{{ item }}'
+    - name: Install Ansible for AlmaLinux 8
+      dnf:
+        name: ansible
         state: present
-      loop:
-        - https://github.com/infra-ci-book/support/raw/master/obsoleted/ansible-2.4.2.0-2.el7.noarch.rpm
-        - https://github.com/infra-ci-book/support/raw/master/obsoleted/ansible-lint-3.4.21-1.el7.centos.noarch.rpm
 
     - name: Start and enable sshd service on console
       systemd:
@@ -79,10 +86,11 @@
         state: started
         enabled: true
 
-    - file:
+    - name: Create Vagrant machine directories
+      file:
         path: '/home/vagrant/vagrant/infraci/.vagrant/machines/{{ item }}/virtualbox'
         state: directory
-        mode: 0700
+        mode: '0700'
         owner: vagrant
         group: vagrant
       loop:
@@ -93,10 +101,11 @@
         - test-ketchup
         - test-ketchup-nginx
 
-    - copy:
+    - name: Copy private keys for Vagrant machines
+      copy:
         src: private_key
         dest: '/home/vagrant/vagrant/infraci/.vagrant/machines/{{ item }}/virtualbox/private_key'
-        mode: 0600
+        mode: '0600'
         owner: vagrant
         group: vagrant
       loop:
@@ -107,23 +116,26 @@
         - test-ketchup
         - test-ketchup-nginx
 
-    - copy:
+    - name: Copy vim configuration
+      copy:
         src: vimrc
         dest: '/home/vagrant/.vimrc'
-        mode: 0755
+        mode: '0755'
         owner: vagrant
         group: vagrant
 
-    - file:
+    - name: Create SSH directory for vagrant user
+      file:
         path: /home/vagrant/.ssh
         state: directory
-        mode: 0700
+        mode: '0700'
         owner: vagrant
         group: vagrant
 
-    - copy:
+    - name: Copy SSH private key
+      copy:
         src: private_key
         dest: /home/vagrant/.ssh/infraci
-        mode: 0600
+        mode: '0600'
         owner: vagrant
         group: vagrant
