@@ -1,19 +1,9 @@
 x-template: &template
-  build:
-    context: ../
-    dockerfile: Dockerfile.systemd
+  image: almalinux:8
   platform: linux/arm64
-  privileged: true # systemdサービス動作のために必要
+  privileged: false
   command: /sbin/init
   restart: always
-  tmpfs:
-    - /tmp
-    - /run
-    - /run/lock
-  volumes:
-    - /sys/fs/cgroup:/sys/fs/cgroup:rw
-  cap_add:
-    - SYS_ADMIN
 
 services:
   gitlab:

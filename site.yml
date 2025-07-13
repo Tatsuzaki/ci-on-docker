@@ -12,17 +12,15 @@
         - openssh-clients
         - sudo
 
-    - name: Start and enable sshd service
-      systemd:
+    - systemd:
         name: sshd
         state: started
         enabled: true
 
-    - name: Disable getty services
-      systemd:
+    - systemd:
         name: '{{ item }}'
         state: stopped
-        masked: true
+        masked: yes
       with_items:
         - getty@tty1.service
         - serial-getty@ttyS0.service
@@ -80,8 +78,7 @@
         name: ansible
         state: present
 
-    - name: Start and enable sshd service on console
-      systemd:
+    - systemd:
         name: sshd
         state: started
         enabled: true
