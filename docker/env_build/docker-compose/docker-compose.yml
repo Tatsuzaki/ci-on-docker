@@ -1,8 +1,8 @@
 x-template: &template
   image: almalinux:8
   platform: linux/arm64
-  privileged: false
-  command: /sbin/init
+  privileged: true
+  command: /usr/sbin/init
   restart: always
 
 services:
