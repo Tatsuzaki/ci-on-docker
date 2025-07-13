@@ -7,9 +7,13 @@ Setup_Clients_Env:
   image:
     name: almalinux:8
   script:
-    # Install EPEL and required packages
+    # Enable PowerTools/CRB repository for additional packages
     - dnf install -y epel-release
-    - dnf install -y ansible docker-ce-cli python3-pip
+    - dnf config-manager --set-enabled powertools
+    # Add Docker CE repository
+    - dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    # Install required packages
+    - dnf install -y ansible docker-ce-cli python3-pip containerd.io
     # Verify installations
     - docker version
     - ANSIBLE_CONFIG=./ansible.cfg ansible --version

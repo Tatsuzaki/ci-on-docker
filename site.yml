@@ -3,22 +3,24 @@
   gather_facts: false
   tasks:
     - yum:
-        name: "{{ item }}"
+        name: '{{ item }}'
         state: latest
       loop:
         - openssh-server
         - openssh-clients
         - sudo
 
-    - systemd:
+    - name: Start and enable sshd service
+      systemd:
         name: sshd
         state: started
         enabled: true
 
-    - systemd:
-        name: "{{ item }}"
+    - name: Disable getty services
+      systemd:
+        name: '{{ item }}'
         state: stopped
-        masked: yes
+        masked: true
       with_items:
         - getty@tty1.service
         - serial-getty@ttyS0.service
@@ -55,7 +57,7 @@
   gather_facts: true
   tasks:
     - yum:
-        name: "{{ item }}"
+        name: '{{ item }}'
         state: latest
       loop:
         - vim
@@ -65,19 +67,20 @@
         - epel-release
 
     - yum:
-        name: "{{ item }}"
+        name: '{{ item }}'
         state: present
       loop:
         - https://github.com/infra-ci-book/support/raw/master/obsoleted/ansible-2.4.2.0-2.el7.noarch.rpm
         - https://github.com/infra-ci-book/support/raw/master/obsoleted/ansible-lint-3.4.21-1.el7.centos.noarch.rpm
 
-    - systemd:
+    - name: Start and enable sshd service on console
+      systemd:
         name: sshd
         state: started
         enabled: true
 
     - file:
-        path: "/home/vagrant/vagrant/infraci/.vagrant/machines/{{ item }}/virtualbox"
+        path: '/home/vagrant/vagrant/infraci/.vagrant/machines/{{ item }}/virtualbox'
         state: directory
         mode: 0700
         owner: vagrant
@@ -92,7 +95,7 @@
 
     - copy:
         src: private_key
-        dest: "/home/vagrant/vagrant/infraci/.vagrant/machines/{{ item }}/virtualbox/private_key"
+        dest: '/home/vagrant/vagrant/infraci/.vagrant/machines/{{ item }}/virtualbox/private_key'
         mode: 0600
         owner: vagrant
         group: vagrant
@@ -106,7 +109,7 @@
 
     - copy:
         src: vimrc
-        dest: "/home/vagrant/.vimrc"
+        dest: '/home/vagrant/.vimrc'
         mode: 0755
         owner: vagrant
         group: vagrant
